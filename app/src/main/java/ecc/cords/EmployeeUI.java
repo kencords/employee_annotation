@@ -3,6 +3,7 @@ package ecc.cords;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EmployeeUI {
 
@@ -26,7 +27,7 @@ public class EmployeeUI {
 		employee.setTitle(InputHelper.askString("Enter Title: ", true));
 		employee.setBirthDate(InputHelper.askDate("Enter Birthdate (yyyy-mm-dd): "));
 		employee.setGwa(InputHelper.askPositiveFloat("Enter GWA (float): ", false));
-		employee.setAddress(createAddressDTO());		
+		employee.setAddress(askAddressDTO());		
 		System.out.println("CONTACT INFORMATION");
 		employee.setContacts(ContactUI.getInstance().askContacts(true));
 		System.out.println("\nCAREER INFORMATION");
@@ -36,7 +37,7 @@ public class EmployeeUI {
 		return EmployeeManager.addEmployee(employee);
 	}
 
-	public AddressDTO createAddressDTO() {
+	public AddressDTO askAddressDTO() {
 		System.out.println("ADDRESS:");
 		AddressDTO address = new AddressDTO();
 		address.setStreetNo(InputHelper.askPositiveNumber("Enter Street No: ", false));
@@ -47,7 +48,17 @@ public class EmployeeUI {
 		return address;
 	}
 
-	public Employee editEmployeeDetails(Employee employee) throws Exception {
+	public void editEmployee() throws Exception {
+		System.out.print("\033\143");
+		System.out.println("EDIT EMPLOYEE...\n\n");
+		System.out.println("EMPLOYEE LIST:");
+		System.out.println(getEmployees());
+		int id = InputHelper.askPositiveNumber("\nEnter Employee ID: ", false);
+		EmployeeDTO employee = mapper.mapToEmployeeDTO(EmployeeManager.getEmployee(id));
+		manageEmployee(employee);
+	}
+
+	public EmployeeDTO editEmployeeDetails(EmployeeDTO employee) throws Exception {
 		System.out.println("\n1. EDIT NAME");
 		System.out.println("2. EDIT BIRTHDATE");
 		System.out.println("3. EDIT ADDRESS");
@@ -55,10 +66,9 @@ public class EmployeeUI {
 		System.out.println("5. EDIT CAREER INFORMATION");
 		System.out.println("6. BACK");
 		String choice = InputHelper.askChoice("\nWhat do you want to do? (Enter Choice Number): ");
-
 		switch(choice) {
 			case "1":
-				editEmployeeName(employee);
+				employee = editEmployeeName(employee);
 				break;
 			case "2":
 				System.out.println("\nEDIT BIRTHDATE\n");
@@ -66,7 +76,7 @@ public class EmployeeUI {
 				logMsg = "Successfully edited Employee Birthdate!";
 				break;
 			case "3":
-				editEmployeeAddress(employee);
+				employee = editEmployeeAddress(employee);
 				break;
 			case "4":
 				System.out.println("\nEDIT GWA\n");
@@ -84,7 +94,6 @@ public class EmployeeUI {
 			default:
 				System.out.println("Invalid Choice!");
 		}
-
 		return employee;
 	}
 
@@ -96,16 +105,6 @@ public class EmployeeUI {
 		int id = InputHelper.askPositiveNumber("\nEnter Employee ID: ", false);		
 		daoService.deleteElement(EmployeeManager.getEmployee(id));
 		return "Deleted Employee " + id + "!";
-	}
-
-	public void editEmployee() throws Exception {
-		System.out.print("\033\143");
-		System.out.println("EDIT EMPLOYEE...\n\n");
-		System.out.println("EMPLOYEE LIST:");
-		System.out.println(getEmployees());
-		int id = InputHelper.askPositiveNumber("\nEnter Employee ID: ", false);
-		EmployeeDTO employee = mapper.mapToEmployeeDTO(EmployeeManager.getEmployee(id));
-		manageEmployee(employee);
 	}
 
 	public String getEmployeeDetail(EmployeeDTO employee, String type) {
@@ -125,7 +124,9 @@ public class EmployeeUI {
 		employee.getContacts().stream()
 							  .sorted((c1,c2) -> Long.compare(c1.getContactId(),c2.getContactId()))
 							  .forEach(contact -> sb.append("\n" + (type.equals("")? contact : "[" + contact.getContactType() + ": " + contact.getContactValue() + "]")));
-		sb.append("\nROLES: " + employee.getRoles() + "\n");
+		sb.append("\nROLES: " + employee.getRoles().stream()
+												   .sorted((role1, role2) -> Long.compare(role1.getRoleId(), role2.getRoleId()))
+												   .collect(Collectors.toList())  + "\n");
 		return sb.toString();
 	}
 
@@ -135,8 +136,9 @@ public class EmployeeUI {
 		return sb.toString(); 
 	}
 
-	public void manageEmployee(EmployeeDTO employee) {
+	public void manageEmployee(EmployeeDTO employee) throws Exception {
 		while(true) {
+			employee = mapper.mapToEmployeeDTO(EmployeeManager.getEmployee((int) (long) employee.getEmpId()));
 			System.out.println(getEmployeeDetail(employee,""));
 			System.out.println("1. EDIT EMPLOYEE DETAILS");
 			System.out.println("2. ADD ROLE");
@@ -152,50 +154,51 @@ public class EmployeeUI {
 			try {
 				switch(choice) {
 					case "1":
-						//employee = editEmployeeDetails(employee);
+						employee = editEmployeeDetails(employee);
 						break;
 					case "2":
-						//System.out.println("\n" + RoleUI.getInstance().getFilteredRoles(employee));
+						System.out.println("\n" + RoleUI.getInstance().getFilteredRoles(employee));
 						id = InputHelper.askPositiveNumber("What Role? (Enter Role ID): ", false);
-						//employee = EmployeeManager.addEmployeeRole(employee, id);
+						employee = EmployeeManager.addEmployeeRole(employee, id);
 						break;
 					case "3":
 						id = InputHelper.askPositiveNumber("What Role? (Enter Role ID to delete): ", false);
-						//employee = EmployeeManager.deleteEmployeeRole(employee, id);
+						employee = EmployeeManager.deleteEmployeeRole(employee, id);
 						break;
 					case "4":
-						//employee = EmployeeManager.addContact(employee, ContactUI.getInstance().askContacts(false));
+						employee = EmployeeManager.addContact(employee, ContactUI.getInstance().askContacts(false));
 						break;
 					case "5":
-						//ContactUI.getInstance().manageContact(employee, false);
+						ContactUI.getInstance().manageContact(employee, false);
 						break;	
 					case "6":
-						//ContactUI.getInstance().manageContact(employee, true);
+						ContactUI.getInstance().manageContact(employee, true);
 						break;
 					case "7":
 						return;
 					default:
 						System.out.println("Invalid Choice!");
 				}
-				//EmployeeManager.addOrUpdateEmployee(employee);
+				daoService.updateElement(mapper.mapToEmployee(employee));
 			} catch(Exception exception) {
+				exception.printStackTrace();
 				logMsg = EmployeeManager.getLogMsg();
 			}
 		}
 	}
 
-	private Employee editEmployeeName(Employee employee) {
+	private EmployeeDTO editEmployeeName(EmployeeDTO employee) {
 		System.out.println("\nEDIT EMPLOYEE NAME\n");
-		employee.getName().setLastName(InputHelper.askString("Enter Lastname: ", false));
-		employee.getName().setFirstName(InputHelper.askString("Enter Firstname: ", false));
-		employee.getName().setMiddleName(InputHelper.askString("Enter Middlename: ", false));
-		employee.getName().setSuffix(InputHelper.askString("Enter Suffix: ", true));
-		employee.getName().setTitle(InputHelper.askString("Enter Title: ", true));
+		employee.setLastName(InputHelper.askString("Enter Lastname: ", false));
+		employee.setFirstName(InputHelper.askString("Enter Firstname: ", false));
+		employee.setMiddleName(InputHelper.askString("Enter Middlename: ", false));
+		employee.setSuffix(InputHelper.askString("Enter Suffix: ", true));
+		employee.setTitle(InputHelper.askString("Enter Title: ", true));
 		logMsg = "Successfully edited Employee Name!";
 		return employee;
 	}
 
-	private Employee editEmployeeAddress(Employee employee) {
+	private EmployeeDTO editEmployeeAddress(EmployeeDTO employee) {
 		System.out.println("\nEDIT EMPLOYEE ADDRESS\n");
 		employee.getAddress().setStreetNo(InputHelper.askPositiveNumber("Enter Street No: ", false));
 		employee.getAddress().setStreet(InputHelper.askString("Enter Street: ", false));
@@ -212,7 +215,7 @@ public class EmployeeUI {
 
 	private String getEmployees(){
 		StringBuilder sb = new StringBuilder();
-		List<Employee> employees = daoService.getAllElements(Employee.class);
+		List<EmployeeDTO> employees = mapper.mapEmployeeDTOList("");
 		employees.stream()
 				 .sorted((employee1,employee2) -> Long.compare(employee1.getEmpId(), employee2.getEmpId()))
 				 .forEach(employee -> sb.append(employee + "\n"));

@@ -12,17 +12,8 @@ public class EmployeeManager{
 	private static String logMsg = "";
 
 	public static String addEmployee(EmployeeDTO employeeDTO) {
-		Employee employee = new Employee();
+		Employee employee = mapper.mapToEmployee(employeeDTO);
 		try {
-			employee.setName(new Name(employeeDTO.getLastName(), employeeDTO.getFirstName(), employeeDTO.getMiddleName(), employeeDTO.getSuffix(), 
-			employeeDTO.getTitle()));
-			employee.setBirthDate(employeeDTO.getBirthDate());
-			employee.setGwa(employeeDTO.getGwa());
-			employee.setAddress(createAddress(employeeDTO.getAddress()));
-			employee.setCurrentlyHired(employeeDTO.isCurrentlyHired());
-			employee.setHireDate(employeeDTO.getHireDate());
-			employee.setRoles(mapper.createRoleSet(employeeDTO.getRoles()));
-			employee.setContacts(mapper.createContactSet(employee, employeeDTO.getContacts()));
 			daoService.saveElement(employee);
 		} catch(Exception exception) {
 			exception.printStackTrace();
@@ -31,19 +22,11 @@ public class EmployeeManager{
 		return "Employee Creation Successful!";
 	}
 
-	public static Address createAddress(AddressDTO addressDTO) {
-		return new Address(addressDTO.getStreetNo(), addressDTO.getStreet(), addressDTO.getBrgy(), addressDTO.getCity(), addressDTO.getZipcode());
-	}
-
-	public static ContactDTO createContact(String contactType, String contactValue) {
-		return new ContactDTO(contactType, contactValue);
-	}
-
 	public static Name createName(String lname, String fname, String mname, String suffix, String title) {
 		return new Name(lname, fname, mname, suffix, title);
 	}
 
-	public static Employee addContact(Employee employee, Set<Contact> contacts) {
+	public static EmployeeDTO addContact(EmployeeDTO employee, Set<ContactDTO> contacts) {
 		contacts.forEach(contact -> { 
 			contact.setEmployee(employee);
 			employee.getContacts().add(contact);
@@ -51,22 +34,23 @@ public class EmployeeManager{
 		return employee;
 	}
 
-	public static void updateContact(Employee employee, Contact contact, String contactValue) {
+	public static void updateContact(EmployeeDTO employee, ContactDTO contact, String contactValue) {
 		employee.getContacts().remove(contact);
 		contact.setContactValue(contactValue);
 		employee.getContacts().add(contact);
-		daoService.updateElement(contact);
+		daoService.updateElement(mapper.createContact(contact));
 	}
 
-	public static void deleteContact(Employee employee, Contact contact) throws Exception {
+	public static void deleteContact(EmployeeDTO employee, ContactDTO contact) throws Exception {
 		if(employee.getContacts().size()==1) {
 			logMsg = "Employee must have atleast one contact!";
 			throw new Exception();																				
 		}
+		daoService.deleteElement(mapper.createContact(contact));
 		employee.getContacts().remove(contact);
 	}
 														
-	public static Contact getContact(Long emp_id, int contact_id) throws Exception {
+	public static ContactDTO getContact(Long emp_id, int contact_id) throws Exception {
 		Contact contact = new Contact();
 		try {
 			contact = daoService.getElement(Long.valueOf(contact_id), Contact.class);
@@ -78,8 +62,11 @@ public class EmployeeManager{
 		if(contact.getEmployee().getEmpId()!= Long.valueOf(emp_id)) {
 			logMsg = "Contact does not belong to Employee " + emp_id + "!";
 			throw new Exception();
-		} 
-		return contact;
+		}
+		ContactDTO contactDTO = new ContactDTO(contact.getContactType(), contact.getContactValue());
+		contactDTO.setContactId(contact.getContactId());
+		contactDTO.setEmployee(mapper.mapToEmployeeDTO(contact.getEmployee()));
+		return contactDTO;
 	}
 
 	public static Employee getEmployee(int id) throws Exception {
@@ -94,11 +81,11 @@ public class EmployeeManager{
 		}
 	}
 
-	public static Employee addEmployeeRole(Employee employee, int role_id) throws Exception{
+	public static EmployeeDTO addEmployeeRole(EmployeeDTO employee, int role_id) throws Exception{
 		try {
-			Set<Role> roles = employee.getRoles();
+			Set<RoleDTO> roles = employee.getRoles();
 			Role role = daoService.getElement(Long.valueOf(role_id), Role.class);
-			roles.add(role);
+			roles.add(mapper.mapToRoleDTO(role));
 			employee.setRoles(roles);
 			return employee;
 		} catch(Exception exception) {
@@ -107,10 +94,10 @@ public class EmployeeManager{
 		}
 	}
 
-	public static Employee deleteEmployeeRole(Employee employee, int role_id) {
-		Set<Role> roles = employee.getRoles();
+	public static EmployeeDTO deleteEmployeeRole(EmployeeDTO employee, int role_id) throws Exception {
+		Set<RoleDTO> roles = employee.getRoles();
 		Role role = daoService.getElement(Long.valueOf(role_id), Role.class);
-		roles.remove(role);
+		roles.remove(mapper.mapToRoleDTO(role));
 		employee.setRoles(roles);
 		return employee;
 	}
@@ -126,7 +113,8 @@ public class EmployeeManager{
 		}
 	}
 
-	public static String deleteRole(Role role) throws Exception {
+	public static String deleteRole(RoleDTO roleDTO) throws Exception {
+		Role role = mapper.mapToRole(roleDTO);
 		try {
 			daoService.deleteElement(role);
 			return "Successfully deleted role " + role.getRoleName() + "!";
@@ -136,7 +124,8 @@ public class EmployeeManager{
 		}
 	}
 
-	public static String updateRole(Role role, String role_name) throws Exception {
+	public static String updateRole(RoleDTO roleDTO, String role_name) throws Exception {
+		Role role = mapper.mapToRole(roleDTO);
 		String prev_name = role.getRoleName();
 		if(role.getEmployees().size()==0) {
 			role.setRoleName(role_name);
@@ -152,7 +141,7 @@ public class EmployeeManager{
 		throw new Exception();
 	}
 
-	public static Role getRole(int role_id) throws Exception {
+	public static RoleDTO getRole(int role_id) throws Exception {
 		Role role = new Role();
 		try {
 			role = daoService.getElement(Long.valueOf(role_id), Role.class);
@@ -161,7 +150,7 @@ public class EmployeeManager{
 			logMsg = "Role does not exist!";
 			throw exception;
 		}
-		return role;
+		return mapper.mapToRoleDTO(role);
 	}
 
 	public static String getLogMsg() {

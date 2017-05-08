@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 public class RoleUI {
 
 	private static RoleUI roleUI = null;
-	private static DaoService daoService = new DaoService();
 	private static DTO_EntityMapper mapper = new DTO_EntityMapper();
 	private static String logMsg = "";
 
@@ -25,7 +24,7 @@ public class RoleUI {
 			System.out.println("2. EDIT ROLE");
 			System.out.println("3. DELETE ROLE");
 			System.out.println("4. BACK");
-			Role role = new Role();
+			RoleDTO role = new RoleDTO();
 			String choice = InputHelper.askChoice("What do you want to do? (Enter Choice Number): ");
 			try {
 				switch(choice) {
@@ -67,7 +66,7 @@ public class RoleUI {
 			availRoles.forEach(System.out::println);
 			int role_id = InputHelper.askPositiveNumber("What Role? (Enter role number): ", false);
 			try {
-				roles.add(mapper.mapToRoleDTO(EmployeeManager.getRole(role_id)));
+				roles.add(EmployeeManager.getRole(role_id));
 			} catch(Exception exception){
 				System.out.println(EmployeeManager.getLogMsg() + "\n");
 				continue;
@@ -84,24 +83,24 @@ public class RoleUI {
 		return roles;
 	}
 
-	public String getFilteredRoles(Employee employee) {
+	public String getFilteredRoles(EmployeeDTO employee) {
 		StringBuilder sb = new StringBuilder();
-		daoService.getAllElements(Role.class).stream()
-											 .filter(role -> !employee.getRoles().contains(role))
-											 .sorted((role1,role2) -> Long.compare(role1.getRoleId(), role2.getRoleId()))
-											 .forEach(role -> sb.append(role + "\n"));
+		mapper.getAllRoles().stream()
+						  	.filter(role -> !employee.getRoles().contains(role))
+						  	.sorted((role1,role2) -> Long.compare(role1.getRoleId(), role2.getRoleId()))
+							.forEach(role -> sb.append(role + "\n"));
 		return sb.toString();
 	}
 
 	public String getRoles() {
 		StringBuilder sb = new StringBuilder();
-		daoService.getAllElements(Role.class).stream()
-											 .sorted((role1,role2) -> Long.compare(role1.getRoleId(), role2.getRoleId()))
-											 .forEach(role -> sb.append(role + "\n"));
+		mapper.getAllRoles().stream()
+							.sorted((role1,role2) -> Long.compare(role1.getRoleId(), role2.getRoleId()))
+							.forEach(role -> sb.append(role + "\n"));
 		return sb.toString();
 	}
 
-	private String getRoleOwners(Role role) {
+	private String getRoleOwners(RoleDTO role) {
 		StringBuilder sb = new StringBuilder();
 		role.getEmployees().stream()
 						   .sorted((emp1,emp2) -> Long.compare(emp1.getEmpId(), emp2.getEmpId()))

@@ -9,14 +9,33 @@ public class DTO_EntityMapper {
 
 	private static DaoService daoService = new DaoService();
 
+	public Address createAddress(AddressDTO addressDTO) {
+		Address address = new Address(addressDTO.getStreetNo(), addressDTO.getStreet(), addressDTO.getBrgy(), addressDTO.getCity(), addressDTO.getZipcode());
+		address.setAddrId(addressDTO.getAddrId());
+		return address;
+	}
+
 	public AddressDTO createAddressDTO(Address address) {
-		return new AddressDTO(address.getStreetNo(), address.getStreet(), address.getBrgy(), address.getCity(), address.getZipcode());
+		return new AddressDTO(address.getAddrId(), address.getStreetNo(), address.getStreet(), address.getBrgy(), address.getCity(), address.getZipcode());
+	}
+
+	public Contact createContact(ContactDTO contactDTO) {
+		Contact contact = new Contact(contactDTO.getContactType(), contactDTO.getContactValue());
+		contact.setContactId(contactDTO.getContactId());
+		contact.setEmployee(mapToEmployee(contactDTO.getEmployee()));
+		return contact;
+	}
+
+	public ContactDTO createContactDTO(String contactType, String contactValue) {
+		return new ContactDTO(contactType, contactValue);
 	}
 
 	public Set<Contact> createContactSet(Employee employee, Set<ContactDTO> contactsDTO) {
 		Set<Contact> contacts = new HashSet<>();
-		contactsDTO.forEach(contact -> {
-			contacts.add(new Contact(contact.getContactType(), contact.getContactValue()));
+		contactsDTO.forEach(contactDTO -> {
+			Contact contact = new Contact(contactDTO.getContactType(), contactDTO.getContactValue());
+			contact.setContactId(contactDTO.getContactId());
+			contacts.add(contact);
 		});
 		contacts.forEach(contact -> contact.setEmployee(employee));
 		return contacts;
@@ -59,6 +78,21 @@ public class DTO_EntityMapper {
 		return rolesDTO;
 	}
 
+	public Employee mapToEmployee(EmployeeDTO employeeDTO){
+		Employee employee = new Employee();
+		employee.setEmpId(employeeDTO.getEmpId());
+		employee.setName(new Name(employeeDTO.getLastName(), employeeDTO.getFirstName(), employeeDTO.getMiddleName(), employeeDTO.getSuffix(), 
+		employeeDTO.getTitle()));
+		employee.setBirthDate(employeeDTO.getBirthDate());
+		employee.setGwa(employeeDTO.getGwa());
+		employee.setAddress(createAddress(employeeDTO.getAddress()));
+		employee.setCurrentlyHired(employeeDTO.isCurrentlyHired());
+		employee.setHireDate(employeeDTO.getHireDate());
+		employee.setRoles(createRoleSet(employeeDTO.getRoles()));
+		employee.setContacts(createContactSet(employee, employeeDTO.getContacts()));
+		return employee;
+	}
+
 	public EmployeeDTO mapToEmployeeDTO(Employee employee) throws Exception {
 		EmployeeDTO empDTO = new EmployeeDTO();
 		empDTO.setEmpId(employee.getEmpId());
@@ -78,7 +112,7 @@ public class DTO_EntityMapper {
 	}
 
 	public List<EmployeeDTO> mapEmployeeDTOList(String order) {
-		List<Employee> employees = (!order.equals("gwa") ? daoService.getOrderedEmployees(order) : 
+		List<Employee> employees = (!order.equals("") ? daoService.getOrderedEmployees(order) : 
 		daoService.getAllElements(Employee.class));
 		List<EmployeeDTO> employeesDTO = new ArrayList<>();
 		employees.forEach(e -> {
@@ -91,18 +125,40 @@ public class DTO_EntityMapper {
 		return employeesDTO;		
 	}
 
-	/*public Employee mapToEmployee(EmployeeDTO empDTO){
-
-	}*/
-
 	public RoleDTO mapToRoleDTO(Role role) throws Exception {
-		return new RoleDTO(role.getRoleId(), role.getRoleName());
+		RoleDTO roleDTO = new RoleDTO(role.getRoleId(), role.getRoleName());
+		Set<EmployeeDTO> employees = new HashSet<>();
+		role.getEmployees().forEach(employee -> employees.add(createEmployeeDTO(employee)));
+		roleDTO.setEmployees(employees);
+		return roleDTO;
 	}
 
 	public Role mapToRole(RoleDTO roleDTO) {
 		Role role = new Role();
 		role.setRoleId(roleDTO.getRoleId());
 		role.setRoleName(roleDTO.getRoleName());
+		Set<Employee> employees = new HashSet<>();
+		roleDTO.getEmployees().forEach(employee -> employees.add(createEmployee(employee)));
+		role.setEmployees(employees);	
 		return role;
+	}
+
+	private Employee createEmployee(EmployeeDTO employeeDTO) {
+		Employee employee = new Employee();
+		employee.setEmpId(employeeDTO.getEmpId());
+		employee.setName(new Name(employeeDTO.getLastName(), employeeDTO.getFirstName(), employeeDTO.getMiddleName(), employeeDTO.getSuffix(), 
+		employeeDTO.getTitle()));
+		return employee;
+	}
+
+	private EmployeeDTO createEmployeeDTO(Employee employee) {
+		EmployeeDTO empDTO = new EmployeeDTO();
+		empDTO.setEmpId(employee.getEmpId());
+		empDTO.setLastName(employee.getName().getLastName());
+		empDTO.setFirstName(employee.getName().getFirstName());
+		empDTO.setMiddleName(employee.getName().getMiddleName());
+		empDTO.setSuffix(employee.getName().getSuffix());
+		empDTO.setTitle(employee.getName().getTitle());
+		return empDTO;
 	}
 }

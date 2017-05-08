@@ -13,7 +13,8 @@ public class AddressDTO {
 
 	public AddressDTO() {}
 
-	public AddressDTO(int streetNo, String street, String brgy, String city, String zipcode) {
+	public AddressDTO(Long addrId, int streetNo, String street, String brgy, String city, String zipcode) {
+		this.addrId = addrId;
 		this.streetNo = streetNo;
 		this.street = street;
 		this.brgy = brgy;

@@ -150,9 +150,4 @@ public class Employee{
     public void setRoles(Set<Role> roles) { 
         this.roles = roles;
     }
-
-    @Override
-    public String toString(){
-        return "Employee ID: " + empId + " Employee Name: " + name.getLastName() + ", " + name.getFirstName() + " " + name.getMiddleName() + " " + name.getSuffix(); 
-    }
 }

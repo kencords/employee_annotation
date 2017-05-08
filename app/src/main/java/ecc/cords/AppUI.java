@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 public class AppUI{
 
-	private static DaoService daoService = new DaoService();
 	private static DTO_EntityMapper mapper = new DTO_EntityMapper();
 	private static String logMsg = "";
 
@@ -23,7 +22,6 @@ public class AppUI{
 			System.out.println("2. DELETE EMPLOYEE     6. SORT BY LASTNAME");
 			System.out.println("3. EDIT EMPLOYEE       7. SORT BY HIREDATE");
 			System.out.println("4. MANAGE ROLES        8. EXIT");
-
 			try {
 				String choice = InputHelper.askChoice("What do you want to do? (Enter Choice Number): ");
 
@@ -41,7 +39,7 @@ public class AppUI{
 						RoleUI.getInstance().manageRoles();
 						break;
 					case "5":
-						logMsg = "\nEMPLOYEE LIST SORTED BY GWA\n" + EmployeeUI.getInstance().getEmployeeDetails(mapper.mapEmployeeDTOList("gwa").stream()
+						logMsg = "\nEMPLOYEE LIST SORTED BY GWA\n" + EmployeeUI.getInstance().getEmployeeDetails(mapper.mapEmployeeDTOList("").stream()
 								.sorted((emp1,emp2) -> Float.compare(emp1.getGwa(), emp2.getGwa()))
 								.collect(Collectors.toList()), "GWA");
 						break;

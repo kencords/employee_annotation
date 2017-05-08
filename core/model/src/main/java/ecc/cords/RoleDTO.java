@@ -10,6 +10,10 @@ public class RoleDTO {
 
 	private Set<EmployeeDTO> employees = new HashSet<>();
 
+	public RoleDTO() {
+
+	}
+	
 	public RoleDTO(Long roleId, String roleName) {
 		this.roleId = roleId;
 		this.roleName = roleName;

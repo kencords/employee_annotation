@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
@@ -51,8 +52,8 @@ public class Dao{
  	public <T> List getByCriteria(String order, final Class<T> type) {
   		Session session = initSession();
   		List list = session.createCriteria(type)
-  							  .addOrder(Property.forName(order).asc())
-  							  .list();
+  						   .addOrder(Property.forName(order).asc())
+  						   .list();
   		session.close();
   		return list;	
   	}

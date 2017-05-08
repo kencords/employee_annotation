@@ -34,10 +34,6 @@ public class DaoService{
 		dao.save(e);
 	}
 
-	public <E> void saveOrUpdateElement(E e) {
-		dao.saveOrUpdate(e);
-	}
-
 	public <E> void updateElement(E e) {
 		dao.saveOrUpdate(e);
 	}

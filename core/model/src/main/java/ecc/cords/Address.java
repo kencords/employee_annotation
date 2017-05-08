@@ -92,17 +92,6 @@ public class Address {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(streetNo + " ")
-		  .append(street + ", ")
-		  .append(brgy + ", ")
-		  .append(city + " ")
-		  .append(zipcode);
-		 return sb.toString();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if(obj==null || getClass() != obj.getClass())
 			return false;
