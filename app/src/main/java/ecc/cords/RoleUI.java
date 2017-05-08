@@ -10,6 +10,7 @@ public class RoleUI {
 
 	private static RoleUI roleUI = null;
 	private static DaoService daoService = new DaoService();
+	private static DTO_EntityMapper mapper = new DTO_EntityMapper();
 	private static String logMsg = "";
 
 	public  void manageRoles() {
@@ -51,9 +52,9 @@ public class RoleUI {
 		}
 	}
 
-	public Set<Role> askRoles()	{
-		Set<Role> roles = new HashSet<>();
-		List<Role> availRoles = daoService.getAllElements(Role.class);
+	public Set<RoleDTO> askRoles()	{
+		Set<RoleDTO> roles = new HashSet<>();
+		List<RoleDTO> availRoles = mapper.getAllRoles();
 		while(true)	{
 			System.out.println("\nROLES LIST:\n");
 			availRoles = availRoles.stream()
@@ -66,7 +67,7 @@ public class RoleUI {
 			availRoles.forEach(System.out::println);
 			int role_id = InputHelper.askPositiveNumber("What Role? (Enter role number): ", false);
 			try {
-				roles.add(EmployeeManager.getRole(role_id));
+				roles.add(mapper.mapToRoleDTO(EmployeeManager.getRole(role_id)));
 			} catch(Exception exception){
 				System.out.println(EmployeeManager.getLogMsg() + "\n");
 				continue;

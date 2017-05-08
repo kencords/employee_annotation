@@ -43,7 +43,7 @@ public class Contact{
 		return contactId;
 	}
 
-	private void setContactId(Long contactId) {
+	protected void setContactId(Long contactId) {
 		this.contactId = contactId;
 	}
 

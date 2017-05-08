@@ -83,7 +83,7 @@ public class Employee{
         return empId;
     }
 
-    private void setEmpId(Long empId) {
+    protected void setEmpId(Long empId) {
         this.empId = empId;
     }
 

@@ -1,5 +1,9 @@
-ecc/cords/Employee.class
 ecc/cords/Name.class
 ecc/cords/Address.class
+ecc/cords/AddressDTO.class
+ecc/cords/RoleDTO.class
+ecc/cords/EmployeeDTO.class
+ecc/cords/Employee.class
+ecc/cords/ContactDTO.class
 ecc/cords/Contact.class
 ecc/cords/Role.class

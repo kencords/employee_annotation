@@ -29,8 +29,8 @@ public class ContactUI {
 		EmployeeManager.deleteContact(employee,contact);
 	}
 
-	public Set<Contact> askContacts(boolean isNew) {
-		Set<Contact> contacts = new HashSet<>(); 
+	public Set<ContactDTO> askContacts(boolean isNew) {
+		Set<ContactDTO> contacts = new HashSet<>(); 
 		while(true) {
 			System.out.println("\nWHAT TYPE OF CONTACT?");
 			System.out.println("1. LANDLINE");

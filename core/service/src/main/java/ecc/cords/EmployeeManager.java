@@ -8,13 +8,21 @@ import java.util.Set;
 public class EmployeeManager{
 
 	private static DaoService daoService = new DaoService();
+	private static DTO_EntityMapper mapper = new DTO_EntityMapper();
 	private static String logMsg = "";
 
-	public static String addEmployee(Name name, Date birthdate, float gwa, Address address, Set<Contact> contacts, boolean curHired, Date hiredate, Set<Role> roles){
-		Employee employee;
+	public static String addEmployee(EmployeeDTO employeeDTO) {
+		Employee employee = new Employee();
 		try {
-			employee = new Employee(name, birthdate, hiredate, gwa, curHired, address, contacts, roles);
-			contacts.forEach(contact -> contact.setEmployee(employee));
+			employee.setName(new Name(employeeDTO.getLastName(), employeeDTO.getFirstName(), employeeDTO.getMiddleName(), employeeDTO.getSuffix(), 
+			employeeDTO.getTitle()));
+			employee.setBirthDate(employeeDTO.getBirthDate());
+			employee.setGwa(employeeDTO.getGwa());
+			employee.setAddress(createAddress(employeeDTO.getAddress()));
+			employee.setCurrentlyHired(employeeDTO.isCurrentlyHired());
+			employee.setHireDate(employeeDTO.getHireDate());
+			employee.setRoles(mapper.createRoleSet(employeeDTO.getRoles()));
+			employee.setContacts(mapper.createContactSet(employee, employeeDTO.getContacts()));
 			daoService.saveElement(employee);
 		} catch(Exception exception) {
 			exception.printStackTrace();
@@ -23,12 +31,12 @@ public class EmployeeManager{
 		return "Employee Creation Successful!";
 	}
 
-	public static Address createAddress(int strNo,String street, String brgy, String city, String zipcode){
-		return new Address(strNo, street, brgy, city, zipcode);
+	public static Address createAddress(AddressDTO addressDTO) {
+		return new Address(addressDTO.getStreetNo(), addressDTO.getStreet(), addressDTO.getBrgy(), addressDTO.getCity(), addressDTO.getZipcode());
 	}
 
-	public static Contact createContact(String contactType, String contactValue) {
-		return new Contact(contactType, contactValue);
+	public static ContactDTO createContact(String contactType, String contactValue) {
+		return new ContactDTO(contactType, contactValue);
 	}
 
 	public static Name createName(String lname, String fname, String mname, String suffix, String title) {

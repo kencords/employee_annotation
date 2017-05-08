@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 public class AppUI{
 
 	private static DaoService daoService = new DaoService();
+	private static DTO_EntityMapper mapper = new DTO_EntityMapper();
 	private static String logMsg = "";
 
 	public AppUI() {
@@ -40,16 +41,16 @@ public class AppUI{
 						RoleUI.getInstance().manageRoles();
 						break;
 					case "5":
-						logMsg = "\nEMPLOYEE LIST SORTED BY GWA\n" + EmployeeUI.getInstance().getEmployeeDetails(daoService.getAllElements(Employee.class).stream()
+						logMsg = "\nEMPLOYEE LIST SORTED BY GWA\n" + EmployeeUI.getInstance().getEmployeeDetails(mapper.mapEmployeeDTOList("gwa").stream()
 								.sorted((emp1,emp2) -> Float.compare(emp1.getGwa(), emp2.getGwa()))
 								.collect(Collectors.toList()), "GWA");
 						break;
 					case "6":
 						logMsg = "\nEMPLOYEE LIST SORTED BY LASTNAME\n" + EmployeeUI.getInstance()
-								 .getEmployeeDetails(daoService.getOrderedEmployees("name"), "LN"); 
+								 .getEmployeeDetails(mapper.mapEmployeeDTOList("name"), "LN"); 
 						break;
 					case "7":
-						logMsg = "\nEMPLOYEE LIST SORTED BY HIRE DATE\n" + EmployeeUI.getInstance().getEmployeeDetails(daoService.getOrderedEmployees("hireDate"), "DH"); 
+						logMsg = "\nEMPLOYEE LIST SORTED BY HIRE DATE\n" + EmployeeUI.getInstance().getEmployeeDetails(mapper.mapEmployeeDTOList("hireDate"), "DH"); 
 						break;
 					case "8":
 						System.exit(0);

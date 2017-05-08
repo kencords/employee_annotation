@@ -25,9 +25,9 @@ public class Address {
 	@OneToOne(mappedBy = "address")
 	private Employee employee;
 
-	public Address(){}
+	public Address() {}
 
-	public Address(int streetNo, String street, String brgy, String city, String zipcode){
+	public Address(int streetNo, String street, String brgy, String city, String zipcode) {
 		this.streetNo = streetNo;
 		this.street = street;
 		this.brgy = brgy;
@@ -35,27 +35,27 @@ public class Address {
 		this.zipcode = zipcode;
 	}
 
-	public Long getAddrId(){
+	public Long getAddrId() {
 		return addrId;
 	}
 
-	public void setAddrId(Long addrId){
+	protected void setAddrId(Long addrId) {
 		this.addrId = addrId;
 	}
 
-	public Employee getEmployee(){
+	public Employee getEmployee() {
 		return employee;
 	}
 
-	public void setEmployee(Employee employee){
+	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}
 
-	public int getStreetNo(){
+	public int getStreetNo() {
 		return streetNo;
 	}
 
-	public void setStreetNo(int streetNo){
+	public void setStreetNo(int streetNo) {
 		this.streetNo = streetNo;
 	}
 
@@ -63,36 +63,36 @@ public class Address {
 		return street;
 	}
 
-	public void setStreet(String street){
+	public void setStreet(String street) {
 		this.street = street;
 	}
 
-	public String getBrgy(){
+	public String getBrgy() {
 		return brgy;
 	}
 
-	public void setBrgy(String brgy){
+	public void setBrgy(String brgy) {
 		this.brgy = brgy;
 	}
 
-	public String getCity(){
+	public String getCity() {
 		return city;
 	}
 
-	public void setCity(String city){
+	public void setCity(String city) {
 		this.city = city;
 	}
 
-	public String getZipcode(){
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(String zipcode){
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(streetNo + " ")
 		  .append(street + ", ")
@@ -103,7 +103,7 @@ public class Address {
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(Object obj) {
 		if(obj==null || getClass() != obj.getClass())
 			return false;
 		Address tmp = (Address) obj;
@@ -113,7 +113,7 @@ public class Address {
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return java.util.Objects.hash(streetNo, street, brgy, city, zipcode);
 	}
 }
