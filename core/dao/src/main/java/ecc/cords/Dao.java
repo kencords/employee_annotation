@@ -9,10 +9,14 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.stat.Statistics;
 
 public class Dao{
 
+	private final Statistics stats = HibernateUtil.getSessionFactory().getStatistics();
+
  	public Session initSession() {
+ 		stats.setStatisticsEnabled(true);
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		if(!session.getTransaction().isActive()) {
 			session.beginTransaction();
@@ -30,6 +34,7 @@ public class Dao{
 	public <T> T get(final long id, final Class<T> type) {
 		Session session = initSession();
 		T t = (T) session.get(type, id);
+		showStatistics(stats);
 		session.close();
 		return t;
 	}
@@ -38,6 +43,7 @@ public class Dao{
 		Session session = initSession();
 		List<T> list = session.createCriteria(t.getClass()).list();
 		session.getTransaction().commit();
+		showStatistics(stats);
 		session.close();
 		return (T) list.get(list.indexOf((T)t));
 	}
@@ -45,24 +51,20 @@ public class Dao{
 	public <T> List<T> getAll(final Class<T> type) {
 	   	Session session = initSession();
 	   	List<T> list = session.createCriteria(type).list();
+	   	showStatistics(stats);
 	   	session.close();
 	   	return list;
  	}
 
  	public <T> List getByCriteria(String order, final Class<T> type) {
   		Session session = initSession();
-  		List list = session.createCriteria(type)
-  						   .addOrder(Property.forName(order).asc())
-  						   .list();
+  		Criteria criteria = session.createCriteria(type)
+  						   .addOrder(Property.forName(order).asc());	  
+		criteria.setCacheable(true);  						   
+		List list = criteria.list();
+		showStatistics(stats);
   		session.close();
   		return list;	
-  	}
-
-  	public <T> List<T> getByQuery(String query, final Class<T> type) {
-	  	Session session = initSession();
-	   	List<T> list = session.createQuery(query).list();
-	   	session.close();
-	   	return list;
   	}
 
   	public <T> void save(final T t) {
@@ -77,5 +79,15 @@ public class Dao{
 	   	session.saveOrUpdate(t);
 	   	session.getTransaction().commit();
 	   	session.close();
+	}
+
+	private void showStatistics(Statistics stats) {
+		System.out.println("***********************************");
+		System.out.println(HibernateUtil.getSessionFactory().getStatistics());
+        System.out.println("Entity fetch count :" + stats.getEntityFetchCount());
+        System.out.println("Second level cache hit count : "+ stats.getSecondLevelCacheHitCount());
+        System.out.println("Second level cache put count : " + stats.getSecondLevelCachePutCount());
+        System.out.println("Second level cache miss count : " + stats.getSecondLevelCacheMissCount());
+        System.out.println("***********************************");
 	}
 }

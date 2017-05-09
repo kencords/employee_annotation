@@ -3,11 +3,14 @@ package ecc.cords;
 import java.util.Date;
 import java.util.Set;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Embedded;
@@ -26,6 +29,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "employees")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Employee{
 
     @Id
@@ -49,16 +54,19 @@ public class Employee{
     @Embedded
     private Name name;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToOne
     @Cascade({CascadeType.ALL})
     @JoinColumn(name="addr_id")
     private Address address;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy="employee", fetch=FetchType.EAGER, orphanRemoval=true)
-    @Cascade({CascadeType.SAVE_UPDATE})
+    @Cascade({CascadeType.ALL})
     @Fetch(FetchMode.SELECT)
     private Set<Contact> contacts;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ManyToMany(fetch=FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
     @JoinTable(name = "employee_role", 
