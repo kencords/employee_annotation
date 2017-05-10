@@ -12,7 +12,7 @@ public class EmployeeManager{
 	private static String logMsg = "";
 
 	public static String addEmployee(EmployeeDTO employeeDTO) {
-		Employee employee = mapper.mapToEmployee(employeeDTO);
+		Employee employee = mapper.mapToEmployee(employeeDTO, true);
 		try {
 			daoService.saveElement(employee);
 		} catch(Exception exception) {
@@ -34,41 +34,17 @@ public class EmployeeManager{
 		return employee;
 	}
 
-	public static void updateContact(EmployeeDTO employee, ContactDTO contact, String contactValue) {
-		employee.getContacts().remove(contact);
-		contact.setContactValue(contactValue);
-		employee.getContacts().add(contact);
-		daoService.updateElement(mapper.createContact(contact));
+	public static void updateContact(EmployeeDTO employee, Set<ContactDTO> contacts) {
+		employee.getContacts().clear();
+		employee.setContacts(contacts);
 	}
 
 	public static void deleteContact(EmployeeDTO employee, ContactDTO contact) throws Exception {
-		if(employee.getContacts().size()==1) {
-			logMsg = "Employee must have atleast one contact!";
-			throw new Exception();																				
-		}
-		daoService.deleteElement(mapper.createContact(contact));
-		employee.getContacts().remove(contact);
+		Set<ContactDTO> contacts = employee.getContacts();
+		contacts.remove(contact);
+		employee.setContacts(contacts);
 	}
-														
-	public static ContactDTO getContact(Long emp_id, int contact_id) throws Exception {
-		Contact contact = new Contact();
-		try {
-			contact = daoService.getElement(Long.valueOf(contact_id), Contact.class);
-			contact.getContactType();
-		} catch(Exception exception) {
-			logMsg = "Contact does not exist!";
-			throw exception;
-		}
-		if(contact.getEmployee().getEmpId()!= Long.valueOf(emp_id)) {
-			logMsg = "Contact does not belong to Employee " + emp_id + "!";
-			throw new Exception();
-		}
-		ContactDTO contactDTO = new ContactDTO(contact.getContactType(), contact.getContactValue());
-		contactDTO.setContactId(contact.getContactId());
-		contactDTO.setEmployee(mapper.mapToEmployeeDTO(contact.getEmployee()));
-		return contactDTO;
-	}
-
+													
 	public static Employee getEmployee(int id) throws Exception {
 		Employee employee = new Employee();
 		try {
@@ -76,6 +52,7 @@ public class EmployeeManager{
 			employee.getName().getLastName();
 			return employee;
 		} catch(Exception exception) {
+			exception.printStackTrace();
 			logMsg = "Employee not found!";
 			throw exception;
 		}

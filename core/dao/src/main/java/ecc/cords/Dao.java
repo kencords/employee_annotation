@@ -34,7 +34,7 @@ public class Dao{
 	public <T> T get(final long id, final Class<T> type) {
 		Session session = initSession();
 		T t = (T) session.get(type, id);
-		showStatistics(stats);
+		showStatistics("from get(id,type)",stats);
 		session.close();
 		return t;
 	}
@@ -43,7 +43,7 @@ public class Dao{
 		Session session = initSession();
 		List<T> list = session.createCriteria(t.getClass()).setCacheable(true).list();
 		session.getTransaction().commit();
-		showStatistics(stats);
+		showStatistics("from get(t)",stats);
 		session.close();
 		return (T) list.get(list.indexOf((T)t));
 	}
@@ -51,7 +51,7 @@ public class Dao{
 	public <T> List<T> getAll(final Class<T> type) {
 	   	Session session = initSession();
 	   	List<T> list = session.createCriteria(type).setCacheable(true).list();
-	   	showStatistics(stats);
+	   	showStatistics("from getAll(type)",stats);
 	   	session.close();
 	   	return list;
  	}
@@ -65,7 +65,7 @@ public class Dao{
  										  .add(Projections.property("name"))
  		);
  		List list = criteria.list();
- 		showStatistics(stats);
+ 		showStatistics("from getAllSimplified(type)",stats);
  		session.close();
  		return list;
  	}
@@ -76,7 +76,7 @@ public class Dao{
   						   .addOrder(Property.forName(order).asc());	  
 		criteria.setCacheable(true);  						   
 		List list = criteria.list();
-		showStatistics(stats);
+		showStatistics("from getByCriteria(order,type)",stats);
   		session.close();
   		return list;	
   	}
@@ -95,9 +95,10 @@ public class Dao{
 	   	session.close();
 	}
 
-	private void showStatistics(Statistics stats) {
+	private void showStatistics(String from, Statistics stats) {
 		System.out.println("***********************************");
 		//System.out.println(HibernateUtil.getSessionFactory().getStatistics());
+		System.out.println(from);
         System.out.println("Entity fetch count :" + stats.getEntityFetchCount());
         System.out.println("Second level cache hit count : "+ stats.getSecondLevelCacheHitCount());
         System.out.println("Second level cache put count : " + stats.getSecondLevelCachePutCount());

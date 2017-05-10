@@ -22,7 +22,7 @@ public class DTO_EntityMapper {
 	public Contact createContact(ContactDTO contactDTO) {
 		Contact contact = new Contact(contactDTO.getContactType(), contactDTO.getContactValue());
 		contact.setContactId(contactDTO.getContactId());
-		contact.setEmployee(mapToEmployee(contactDTO.getEmployee()));
+		contact.setEmployee(mapToEmployee(contactDTO.getEmployee(), false));
 		return contact;
 	}
 
@@ -31,13 +31,21 @@ public class DTO_EntityMapper {
 	}
 
 	public Set<Contact> createContactSet(Employee employee, Set<ContactDTO> contactsDTO) {
-		Set<Contact> contacts = new HashSet<>();
-		contactsDTO.forEach(contactDTO -> {
-			Contact contact = new Contact(contactDTO.getContactType(), contactDTO.getContactValue());
-			contact.setContactId(contactDTO.getContactId());
-			contacts.add(contact);
-		});
-		contacts.forEach(contact -> contact.setEmployee(employee));
+		Set<Contact> contacts = employee.getContacts();
+		if(contacts == null)
+			contacts = new HashSet<>();
+		contacts.clear();
+		try {
+			for(ContactDTO contactDTO : contactsDTO) {
+				Contact contact = new Contact(contactDTO.getContactType(), contactDTO.getContactValue());
+				if(contactDTO.getContactId()!= null)
+					contact.setContactId(contactDTO.getContactId());
+				contact.setEmployee(employee);
+				contacts.add(contact);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		return contacts;
 	}
 
@@ -78,8 +86,11 @@ public class DTO_EntityMapper {
 		return rolesDTO;
 	}
 
-	public Employee mapToEmployee(EmployeeDTO employeeDTO){
+	public Employee mapToEmployee(EmployeeDTO employeeDTO, boolean isNew) {
 		Employee employee = new Employee();
+		if(!isNew) {
+			employee = daoService.getElement(employeeDTO.getEmpId(), Employee.class);
+		}
 		employee.setEmpId(employeeDTO.getEmpId());
 		employee.setName(new Name(employeeDTO.getLastName(), employeeDTO.getFirstName(), employeeDTO.getMiddleName(), employeeDTO.getSuffix(), 
 		employeeDTO.getTitle()));

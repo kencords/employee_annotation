@@ -51,7 +51,7 @@ public class Employee{
     @Column(name = "currentlyhired")
     private boolean currentlyHired;
 
-    @Embedded
+    @Embedded   
     private Name name;
 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

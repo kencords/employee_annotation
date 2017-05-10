@@ -28,10 +28,6 @@ public class Address {
 	private String city;
 	private String zipcode;
 
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	@OneToOne(mappedBy = "address")
-	private Employee employee;
-
 	public Address() {}
 
 	public Address(int streetNo, String street, String brgy, String city, String zipcode) {
@@ -48,14 +44,6 @@ public class Address {
 
 	protected void setAddrId(Long addrId) {
 		this.addrId = addrId;
-	}
-
-	public Employee getEmployee() {
-		return employee;
-	}
-
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
 	}
 
 	public int getStreetNo() {

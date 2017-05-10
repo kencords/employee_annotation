@@ -33,7 +33,8 @@ public class AppUI{
 						logMsg = EmployeeUI.getInstance().deleteEmployee();
 						break;
 					case "3":
-						EmployeeUI.getInstance().editEmployee();
+						boolean isEdited = EmployeeUI.getInstance().editEmployee();
+						logMsg = isEdited? "Successfully Edited Employee!" : "Edit Employee Cancelled!";
 						break;
 					case "4":
 						RoleUI.getInstance().manageRoles();
@@ -45,7 +46,7 @@ public class AppUI{
 						break;
 					case "6":
 						logMsg = "\nEMPLOYEE LIST SORTED BY LASTNAME\n" + EmployeeUI.getInstance()
-								 .getEmployeeDetails(mapper.mapEmployeeDTOList("name"), "LN"); 
+								 .getEmployeeDetails(mapper.mapEmployeeDTOList("name.lastName"), "LN"); 
 						break;
 					case "7":
 						logMsg = "\nEMPLOYEE LIST SORTED BY HIRE DATE\n" + EmployeeUI.getInstance().getEmployeeDetails(mapper.mapEmployeeDTOList("hireDate"), "DH"); 

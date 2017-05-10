@@ -1,7 +1,10 @@
 package ecc.cords;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ContactUI {
 
@@ -11,19 +14,27 @@ public class ContactUI {
 
 	public void manageContact(EmployeeDTO employee, boolean toDelete) throws Exception {
 		System.out.println("\nCONTACT DETAILS:");
-		employee.getContacts().stream()
-							  .sorted((c1,c2) -> Long.compare(c1.getContactId(),c2.getContactId()))
-							  .forEach(System.out::println);
-		ContactDTO contact = EmployeeManager.getContact(employee.getEmpId(), InputHelper.askPositiveNumber("What contact detail to update/delete? (Enter Number): ", false));
+		List<ContactDTO> contacts = new ArrayList<>(employee.getContacts().stream()
+																		  .sorted((c1,c2) -> (c1.getContactType()+c1.getContactValue()).compareTo(c2.getContactType()+c2.getContactValue()))
+																		  .collect(Collectors.toList()));
+		for(int i=0; i < contacts.size(); i++) {
+			System.out.println("["+ (i+1) + "][" + contacts.get(i).getContactType() + ": " + contacts.get(i).getContactValue() + "]");
+		}
+		int id = 0;
+		do{
+			id = InputHelper.askPositiveNumber("What contact detail to update/delete? (Enter Number): ", false);
+			if(id == 0 || id>contacts.size())
+				System.out.println("Invalid Contact Index!");
+		} while(id == 0 || id>contacts.size());
+		ContactDTO contact = contacts.get(id-1); 
 		String value = "";
 		if(!toDelete) {
 			if(contact.getContactType().equals("Landline"))
-				value = InputHelper.askLandline("Enter Landline (xxx-xxxx): ");
+				contact.setContactValue(InputHelper.askLandline("Enter Landline (xxx-xxxx): "));
 			else if(contact.getContactType().equals("Mobile"))
-				value = InputHelper.askMobile("Enter Mobile (xxxx-xxx-xxxx): ");
+				contact.setContactValue(InputHelper.askMobile("Enter Mobile (xxxx-xxx-xxxx): "));
 			else if(contact.getContactType().equals("Email"))
-				value = InputHelper.askEmail("Enter Email: ");
-			EmployeeManager.updateContact(employee,contact,value);
+				contact.setContactValue(InputHelper.askEmail("Enter Email: "));
 			return;
 		}
 		EmployeeManager.deleteContact(employee,contact);
