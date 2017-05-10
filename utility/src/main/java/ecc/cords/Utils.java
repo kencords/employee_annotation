@@ -1,9 +1,15 @@
 package ecc.cords;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils{
+
+	public static String formatDate(Date date) {
+		return new SimpleDateFormat("MMMM dd yyyy").format(date);
+	}
 
 	public static boolean isValidDate(String date) {
 		Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");

@@ -14,10 +14,6 @@ public class DaoService{
 		return dao.getAll(type);
 	}
 
-	public List getOrderedEmployees(String order) {
-		return dao.getByCriteria(order, Employee.class);
-	}
-
 	public <E> E getElement(E e) { 
       	return dao.get(e);
     }
@@ -25,6 +21,14 @@ public class DaoService{
     public <E> E getElement(final long id, final Class<E> type) {
       	return dao.get(id,type);
     }
+
+	public List getOrderedEmployees(String order) {
+		return dao.getByCriteria(order, Employee.class);
+	}
+
+	public List getSimplifiedEmployees() {
+		return dao.getAllSimplified(Employee.class);
+	}
     
 	public <E> void saveElement(E e) {
 		dao.save(e);

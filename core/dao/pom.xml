@@ -31,12 +31,6 @@
       <artifactId>hibernate-ehcache</artifactId>
       <version>4.3.11.Final</version>
     </dependency>
-  
-    <dependency>
-      <groupId>org.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>3.3.1</version>
-    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>

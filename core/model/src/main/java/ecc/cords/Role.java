@@ -34,6 +34,7 @@ public class Role{
 	@Column(name = "role")
 	private String roleName;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SELECT)
 	private Set<Employee> employees = new HashSet<>();

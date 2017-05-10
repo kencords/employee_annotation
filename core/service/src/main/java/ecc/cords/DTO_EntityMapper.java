@@ -125,6 +125,22 @@ public class DTO_EntityMapper {
 		return employeesDTO;		
 	}
 
+	public List<EmployeeDTO> mapSimplifiedEmployees() {
+		List<Object[]> employees = daoService.getSimplifiedEmployees();
+		List<EmployeeDTO> employeesDTO = new ArrayList<>();
+		employees.forEach(obj -> {
+			EmployeeDTO employeeDTO = new EmployeeDTO();
+			employeeDTO.setEmpId((Long)obj[0]);
+			employeeDTO.setLastName(((Name)obj[1]).getLastName());
+			employeeDTO.setFirstName(((Name)obj[1]).getFirstName());
+			employeeDTO.setMiddleName(((Name)obj[1]).getMiddleName());
+			employeeDTO.setSuffix(((Name)obj[1]).getSuffix());
+			employeeDTO.setTitle(((Name)obj[1]).getTitle());
+			employeesDTO.add(employeeDTO);
+		});
+		return employeesDTO;
+	}
+
 	public RoleDTO mapToRoleDTO(Role role) throws Exception {
 		RoleDTO roleDTO = new RoleDTO(role.getRoleId(), role.getRoleName());
 		Set<EmployeeDTO> employees = new HashSet<>();

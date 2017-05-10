@@ -28,6 +28,7 @@ public class Address {
 	private String city;
 	private String zipcode;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@OneToOne(mappedBy = "address")
 	private Employee employee;
 

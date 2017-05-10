@@ -32,6 +32,7 @@ public class Contact{
 	@Column(name="contact_value")
 	private String contactValue;
 
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@ManyToOne(fetch=FetchType.EAGER, optional=false)
 	@Fetch(FetchMode.SELECT)
 	@JoinColumn(name="emp_id", nullable = false)

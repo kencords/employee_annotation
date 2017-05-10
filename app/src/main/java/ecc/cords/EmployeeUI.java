@@ -115,11 +115,11 @@ public class EmployeeUI {
 		(type.equals("LN")? emphasizeText(employee.getLastName()) : employee.getLastName()) + 
 		" " + employee.getSuffix());
 		sb.append("\nADDRESS: " + employee.getAddress());
-		sb.append("\nBIRTHDATE: " + employee.getBirthDate());
+		sb.append("\nBIRTHDATE: " + Utils.formatDate(employee.getBirthDate()));
 		sb.append(type.equals("GWA")? emphasizeText("\nGWA: " + employee.getGwa()) : "\nGWA: " + employee.getGwa());
 		String curHired = employee.isCurrentlyHired() ? "YES" : "NO";
 		sb.append("\nCURRENTLY HIRED: " + curHired);
-		sb.append(type.equals("DH")? emphasizeText("\nDATE HIRED: " + employee.getHireDate()) : "\nDATE HIRED: " + employee.getHireDate());
+		sb.append(type.equals("DH")? emphasizeText("\nDATE HIRED: " + Utils.formatDate(employee.getHireDate())) : "\nDATE HIRED: " + Utils.formatDate(employee.getHireDate()));
 		sb.append("\nCONTACTS: "); 
 		employee.getContacts().stream()
 							  .sorted((c1,c2) -> Long.compare(c1.getContactId(),c2.getContactId()))
@@ -215,7 +215,7 @@ public class EmployeeUI {
 
 	private String getEmployees(){
 		StringBuilder sb = new StringBuilder();
-		List<EmployeeDTO> employees = mapper.mapEmployeeDTOList("");
+		List<EmployeeDTO> employees = mapper.mapSimplifiedEmployees();
 		employees.stream()
 				 .sorted((employee1,employee2) -> Long.compare(employee1.getEmpId(), employee2.getEmpId()))
 				 .forEach(employee -> sb.append(employee + "\n"));

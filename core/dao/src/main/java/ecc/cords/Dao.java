@@ -41,7 +41,7 @@ public class Dao{
 
 	public <T> T get(T t) {
 		Session session = initSession();
-		List<T> list = session.createCriteria(t.getClass()).list();
+		List<T> list = session.createCriteria(t.getClass()).setCacheable(true).list();
 		session.getTransaction().commit();
 		showStatistics(stats);
 		session.close();
@@ -50,10 +50,24 @@ public class Dao{
 
 	public <T> List<T> getAll(final Class<T> type) {
 	   	Session session = initSession();
-	   	List<T> list = session.createCriteria(type).list();
+	   	List<T> list = session.createCriteria(type).setCacheable(true).list();
 	   	showStatistics(stats);
 	   	session.close();
 	   	return list;
+ 	}
+
+ 	public <T> List getAllSimplified(final Class<T> type) {
+ 		Session session = initSession();
+ 		Criteria criteria = session.createCriteria(type);
+ 		criteria.setCacheable(true);
+ 		criteria.setProjection(Projections.projectionList()
+ 										  .add(Projections.property("empId"))
+ 										  .add(Projections.property("name"))
+ 		);
+ 		List list = criteria.list();
+ 		showStatistics(stats);
+ 		session.close();
+ 		return list;
  	}
 
  	public <T> List getByCriteria(String order, final Class<T> type) {
@@ -83,7 +97,7 @@ public class Dao{
 
 	private void showStatistics(Statistics stats) {
 		System.out.println("***********************************");
-		System.out.println(HibernateUtil.getSessionFactory().getStatistics());
+		//System.out.println(HibernateUtil.getSessionFactory().getStatistics());
         System.out.println("Entity fetch count :" + stats.getEntityFetchCount());
         System.out.println("Second level cache hit count : "+ stats.getSecondLevelCacheHitCount());
         System.out.println("Second level cache put count : " + stats.getSecondLevelCachePutCount());
